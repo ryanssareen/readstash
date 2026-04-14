@@ -1,4 +1,4 @@
-const APP_URL = "https://readstash.vercel.app";
+const APP_URL = "https://readstash-ryans-projects-da410e7c.vercel.app";
 
 const saveBtn = document.getElementById("save-btn");
 const pageTitle = document.getElementById("page-title");
