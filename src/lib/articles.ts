@@ -6,10 +6,8 @@ import {
   doc,
   query,
   where,
-  orderBy,
   onSnapshot,
   Timestamp,
-  QueryConstraint,
 } from "firebase/firestore";
 import { getFirebaseDb } from "./firebase";
 import { Article, ArticleInput, FilterTab } from "./types";
@@ -21,25 +19,32 @@ export function subscribeToArticles(
   tab: FilterTab,
   callback: (articles: Article[]) => void
 ) {
-  const constraints: QueryConstraint[] = [
-    where("userId", "==", userId),
-    orderBy("savedAt", "desc"),
-  ];
+  const q = query(
+    collection(getFirebaseDb()!, COLLECTION),
+    where("userId", "==", userId)
+  );
 
-  if (tab === "unread") {
-    constraints.push(where("isRead", "==", false));
-    constraints.push(where("isArchived", "==", false));
-  } else if (tab === "favorites") {
-    constraints.push(where("isFavorite", "==", true));
-  } else if (tab === "archive") {
-    constraints.push(where("isArchived", "==", true));
-  } else {
-    constraints.push(where("isArchived", "==", false));
-  }
-
-  const q = query(collection(getFirebaseDb()!, COLLECTION), ...constraints);
   return onSnapshot(q, (snap) => {
-    const articles = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Article);
+    let articles = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Article);
+
+    // Client-side filtering to avoid composite index requirements
+    if (tab === "unread") {
+      articles = articles.filter((a) => !a.isRead && !a.isArchived);
+    } else if (tab === "favorites") {
+      articles = articles.filter((a) => a.isFavorite);
+    } else if (tab === "archive") {
+      articles = articles.filter((a) => a.isArchived);
+    } else {
+      articles = articles.filter((a) => !a.isArchived);
+    }
+
+    // Sort by savedAt descending
+    articles.sort((a, b) => {
+      const aTime = a.savedAt?.toMillis?.() ?? 0;
+      const bTime = b.savedAt?.toMillis?.() ?? 0;
+      return bTime - aTime;
+    });
+
     callback(articles);
   });
 }
