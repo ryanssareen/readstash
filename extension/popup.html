@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReadStash</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+        </svg>
+        <span>ReadStash</span>
+      </div>
+    </div>
+
+    <div id="page-info" class="page-info">
+      <div class="page-favicon">
+        <img id="page-favicon-img" src="" alt="" />
+      </div>
+      <div class="page-meta">
+        <div id="page-title" class="page-title">Loading...</div>
+        <div id="page-domain" class="page-domain"></div>
+      </div>
+    </div>
+
+    <button id="save-btn" class="btn btn-primary">Save to ReadStash</button>
+
+    <div class="footer-links">
+      <a id="dashboard-link" href="#" target="_blank">Open dashboard</a>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
