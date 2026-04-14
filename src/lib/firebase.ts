@@ -11,23 +11,30 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-function getApp(): FirebaseApp {
+export const isFirebaseConfigured = !!firebaseConfig.apiKey && !!firebaseConfig.projectId;
+
+function getApp(): FirebaseApp | null {
+  if (!isFirebaseConfigured) return null;
   return getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 }
 
-let _auth: Auth | undefined;
-let _db: Firestore | undefined;
+let _auth: Auth | null = null;
+let _db: Firestore | null = null;
 
-export const auth: Auth = new Proxy({} as Auth, {
-  get(_, prop) {
-    if (!_auth) _auth = getAuth(getApp());
-    return Reflect.get(_auth, prop);
-  },
-});
+export function getFirebaseAuth(): Auth | null {
+  if (!isFirebaseConfigured) return null;
+  if (!_auth) {
+    const app = getApp();
+    if (app) _auth = getAuth(app);
+  }
+  return _auth;
+}
 
-export const db: Firestore = new Proxy({} as Firestore, {
-  get(_, prop) {
-    if (!_db) _db = getFirestore(getApp());
-    return Reflect.get(_db, prop);
-  },
-});
+export function getFirebaseDb(): Firestore | null {
+  if (!isFirebaseConfigured) return null;
+  if (!_db) {
+    const app = getApp();
+    if (app) _db = getFirestore(app);
+  }
+  return _db;
+}

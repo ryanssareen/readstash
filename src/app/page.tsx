@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
-  const { user, loading, signIn } = useAuth();
+  const { user, loading, configured, signIn } = useAuth();
   const router = useRouter();
 
   if (!loading && user) {

@@ -11,7 +11,7 @@ import {
   Timestamp,
   QueryConstraint,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { getFirebaseDb } from "./firebase";
 import { Article, ArticleInput, FilterTab } from "./types";
 
 const COLLECTION = "articles";
@@ -37,7 +37,7 @@ export function subscribeToArticles(
     constraints.push(where("isArchived", "==", false));
   }
 
-  const q = query(collection(db, COLLECTION), ...constraints);
+  const q = query(collection(getFirebaseDb()!, COLLECTION), ...constraints);
   return onSnapshot(q, (snap) => {
     const articles = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Article);
     callback(articles);
@@ -45,7 +45,7 @@ export function subscribeToArticles(
 }
 
 export async function saveArticle(data: Omit<ArticleInput, "savedAt" | "readAt" | "isRead" | "isArchived" | "isFavorite" | "tags">) {
-  return addDoc(collection(db, COLLECTION), {
+  return addDoc(collection(getFirebaseDb()!, COLLECTION), {
     ...data,
     savedAt: Timestamp.now(),
     readAt: null,
@@ -57,24 +57,24 @@ export async function saveArticle(data: Omit<ArticleInput, "savedAt" | "readAt" 
 }
 
 export async function toggleFavorite(id: string, current: boolean) {
-  return updateDoc(doc(db, COLLECTION, id), { isFavorite: !current });
+  return updateDoc(doc(getFirebaseDb()!, COLLECTION, id), { isFavorite: !current });
 }
 
 export async function toggleArchive(id: string, current: boolean) {
-  return updateDoc(doc(db, COLLECTION, id), { isArchived: !current });
+  return updateDoc(doc(getFirebaseDb()!, COLLECTION, id), { isArchived: !current });
 }
 
 export async function markAsRead(id: string) {
-  return updateDoc(doc(db, COLLECTION, id), {
+  return updateDoc(doc(getFirebaseDb()!, COLLECTION, id), {
     isRead: true,
     readAt: Timestamp.now(),
   });
 }
 
 export async function deleteArticle(id: string) {
-  return deleteDoc(doc(db, COLLECTION, id));
+  return deleteDoc(doc(getFirebaseDb()!, COLLECTION, id));
 }
 
 export async function updateTags(id: string, tags: string[]) {
-  return updateDoc(doc(db, COLLECTION, id), { tags });
+  return updateDoc(doc(getFirebaseDb()!, COLLECTION, id), { tags });
 }

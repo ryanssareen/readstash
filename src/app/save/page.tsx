@@ -13,7 +13,7 @@ import {
   getDocs,
   limit,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getFirebaseDb } from "@/lib/firebase";
 
 function SavePageContent() {
   const { user, loading: authLoading, signIn } = useAuth();
@@ -30,6 +30,8 @@ function SavePageContent() {
     : null;
 
   const doSave = useCallback(async (uid: string) => {
+    const db = getFirebaseDb();
+    if (!db) return;
     const existing = await getDocs(
       query(
         collection(db, "articles"),
